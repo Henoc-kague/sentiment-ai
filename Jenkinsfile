@@ -17,13 +17,13 @@ pipeline {
 
         stage('Lint') {
             steps {
-                sh '''
+                sh """
                     docker run --rm \
-                        -v $WORKSPACE:/app \
+                        -v ${WORKSPACE}:/app \
                         -w /app \
                         python:3.11-slim \
-                        sh -c "pip install flake8 -q && flake8 src/ --max-line-length=100"
-                '''
+                        sh -c 'pip install flake8 -q && flake8 src/ --max-line-length=100'
+                """
             }
         }
 
@@ -72,7 +72,7 @@ pipeline {
             sh 'docker compose down -v 2>/dev/null || true'
         }
         success {
-            echo "Pipeline réussi ! Image : ${REGISTRY}/${IMAGE_NAME}:${IMAGE_TAG}"
+            echo "Pipeline réussi !"
         }
         failure {
             echo 'Pipeline échoué. Consultez les logs ci-dessus.'

@@ -22,7 +22,7 @@ pipeline {
                         -v ${WORKSPACE}:/app \
                         -w /app \
                         python:3.11-slim \
-                        sh -c 'pip install flake8 -q && flake8 src/ --max-line-length=100'
+                        sh -c 'pip install flake8 -q && ls -la && flake8 src/ --max-line-length=100'
                 """
             }
         }
@@ -38,11 +38,6 @@ pipeline {
                         --cov-report=term-missing \
                         --cov-fail-under=70
                 """
-            }
-            post {
-                failure {
-                    echo 'Tests échoués ou coverage insuffisant (< 70%)'
-                }
             }
         }
 

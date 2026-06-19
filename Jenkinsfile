@@ -17,12 +17,11 @@ pipeline {
 
         stage('Lint') {
             steps {
+                sh "docker build -t ${IMAGE_NAME}:lint ."
                 sh """
                     docker run --rm \
-                        -v ${WORKSPACE}:/app \
-                        -w /app \
-                        python:3.11-slim \
-                        sh -c 'pip install flake8 -q && ls -la && flake8 src/ --max-line-length=100'
+                        ${IMAGE_NAME}:lint \
+                        sh -c 'pip install flake8 -q && flake8 src/ --max-line-length=100'
                 """
             }
         }

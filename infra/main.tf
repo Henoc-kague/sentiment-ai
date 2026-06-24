@@ -8,7 +8,7 @@ terraform {
 }
 
 provider "docker" {
-  host = "unix:///Users/henockague/.docker/run/docker.sock"
+  host = "unix:///var/run/docker.sock"
 }
 
 data "docker_network" "cicd" {

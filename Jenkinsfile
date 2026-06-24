@@ -96,11 +96,10 @@ pipeline {
         }
         stage('Deploy Staging') {
             steps {
-                sh '''
-                    docker compose -f docker-compose.yml -p staging down 2>/dev/null || true
-                    docker compose -f docker-compose.yml -p staging up -d
-                    echo "Staging disponible sur http://localhost:8081"
-                '''
+                sh 'docker stop sentiment-staging 2>/dev/null || true'
+                sh 'docker rm sentiment-staging 2>/dev/null || true'
+                sh "docker run -d --name sentiment-staging -p 8081:8000 ${IMAGE_NAME}:${IMAGE_TAG}"
+                sh 'echo Staging disponible sur http://localhost:8081'
             }
         }
     }

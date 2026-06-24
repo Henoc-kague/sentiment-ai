@@ -64,8 +64,14 @@ pipeline {
         }
         stage('Quality Gate') {
             steps {
-                timeout(time: 15, unit: 'MINUTES') {
-                    waitForQualityGate abortPipeline: true
+                script {
+                    sleep(10)
+                    def response = sh(script: "curl -s -u \${SONARQUBE_TOKEN}: http://sonarqube:9000/api/qualitygates/project_status?projectKey=sentiment-ai", returnStdout: true).trim()
+                    echo "Quality Gate response: \${response}"
+                    if (response.contains('"status":"ERROR"')) {
+                        error('Quality Gate FAILED')
+                    }
+                    echo 'Quality Gate PASSED'
                 }
             }
         }

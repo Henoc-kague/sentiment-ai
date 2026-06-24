@@ -222,3 +222,4 @@ __marimo__/
 *.tfstate
 *.tfstate.backup
 .terraform.lock.hcl
+infra/terraform.tfstate*

@@ -122,6 +122,23 @@ pipeline {
                 sh 'docker ps | grep sentiment-staging'
             }
         }
+        stage('Smoke Test') {
+            steps {
+                sh '''
+                    echo "Attente demarrage (10s)..."
+                    sleep 10
+                    curl -f http://localhost:8082/health || exit 1
+                    echo "/health OK"
+                    curl -s http://localhost:8082/metrics | grep -q sentiment_predictions_total || exit 1
+                    echo "/metrics OK -- metriques SentimentAI presentes"
+                    sleep 20
+                    curl -s "http://localhost:9092/api/v1/query?query=up{job=\"sentiment-ai\"}" | grep -q '"value":.*1' || true
+                    echo "Prometheus check done"
+                    curl -f http://localhost:3000/api/health || exit 1
+                    echo "Grafana OK"
+                '''
+            }
+        }
     }
     post {
         always { sh 'docker compose down -v 2>/dev/null || true' }

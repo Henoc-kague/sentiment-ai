@@ -18,6 +18,15 @@ pipeline {
                 sh "docker run --rm ${IMAGE_NAME}:lint sh -c 'pip install flake8 -q && flake8 src/ --max-line-length=100'"
             }
         }
+
+        stage('IaC Validate') {
+            steps {
+                dir('infra') {
+                    sh 'terraform init -backend=false -input=false'
+                    sh 'terraform validate'
+                }
+            }
+        }
         stage('Build & Test') {
             steps {
                 sh '''
@@ -94,12 +103,19 @@ pipeline {
                 }
             }
         }
+
+        stage('IaC Apply') {
+            steps {
+                dir('infra') {
+                    sh 'terraform init -input=false'
+                    sh "terraform apply -auto-approve -var=\'image_tag=${IMAGE_TAG}\'"
+                }
+            }
+        }
         stage('Deploy Staging') {
             steps {
-                sh 'docker stop sentiment-staging 2>/dev/null || true'
-                sh 'docker rm sentiment-staging 2>/dev/null || true'
-                sh "docker run -d --name sentiment-staging -p 8081:8000 ${IMAGE_NAME}:${IMAGE_TAG}"
-                sh 'echo Staging disponible sur http://localhost:8081'
+                sh 'sleep 5 && curl -f http://localhost:8082/health || exit 1'
+                sh 'echo "Staging OK sur http://localhost:8082"'
             }
         }
     }

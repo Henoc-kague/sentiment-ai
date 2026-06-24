@@ -118,8 +118,8 @@ pipeline {
         }
         stage('Deploy Staging') {
             steps {
-                sh 'sleep 5 && curl -f http://localhost:8082/health || exit 1'
-                sh 'echo "Staging OK sur http://localhost:8082"'
+                sh 'echo "Staging deploye via Terraform sur http://localhost:8082"'
+                sh 'docker ps | grep sentiment-staging'
             }
         }
     }

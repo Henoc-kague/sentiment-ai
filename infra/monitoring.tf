@@ -16,12 +16,6 @@ resource "docker_container" "prometheus" {
     internal = 9090
     external = 9092
   }
-
-  volumes {
-    host_path      = abspath("${path.module}/../monitoring/prometheus.yml")
-    container_path = "/etc/prometheus/prometheus.yml"
-    read_only      = true
-  }
 }
 
 resource "docker_image" "grafana" {

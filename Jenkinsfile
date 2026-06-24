@@ -106,9 +106,13 @@ pipeline {
 
         stage('IaC Apply') {
             steps {
+                sh 'docker stop sentiment-staging 2>/dev/null || true'
+                sh 'docker rm sentiment-staging 2>/dev/null || true'
                 dir('infra') {
                     sh 'terraform init -input=false'
-                    sh "terraform apply -auto-approve -var=\'image_tag=${IMAGE_TAG}\'"
+                    sh 'terraform state rm docker_container.sentiment_staging 2>/dev/null || true'
+                    sh 'terraform state rm docker_image.sentiment 2>/dev/null || true'
+                    sh "terraform apply -auto-approve -var=image_tag=${IMAGE_TAG}"
                 }
             }
         }

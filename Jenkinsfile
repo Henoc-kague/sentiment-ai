@@ -133,14 +133,11 @@ pipeline {
                 sh '''
                     echo "Attente demarrage (10s)..."
                     sleep 10
-                    curl -f http://localhost:8082/health || exit 1
+                    docker exec sentiment-staging python3 -c "import urllib.request; urllib.request.urlopen('http://localhost:8000/health')" || exit 1
                     echo "/health OK"
-                    curl -s http://localhost:8082/metrics | grep -q sentiment_predictions_total || exit 1
+                    docker exec sentiment-staging python3 -c "import urllib.request; r = urllib.request.urlopen('http://localhost:8000/metrics'); print(r.read().decode())" | grep -q sentiment_predictions_total || exit 1
                     echo "/metrics OK -- metriques SentimentAI presentes"
-                    sleep 20
-                    curl -s "http://localhost:9092/api/v1/query?query=up{job=\"sentiment-ai\"}" | grep -q '"value":.*1' || true
-                    echo "Prometheus check done"
-                    curl -f http://localhost:3000/api/health || exit 1
+                    docker exec grafana wget -q -O- http://localhost:3000/api/health | grep -q ok || exit 1
                     echo "Grafana OK"
                 '''
             }

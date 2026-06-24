@@ -112,6 +112,12 @@ pipeline {
                     sh 'terraform init -input=false'
                     sh 'terraform state rm docker_container.sentiment_staging 2>/dev/null || true'
                     sh 'terraform state rm docker_image.sentiment 2>/dev/null || true'
+                    sh 'terraform state rm docker_container.prometheus 2>/dev/null || true'
+                    sh 'terraform state rm docker_image.prometheus 2>/dev/null || true'
+                    sh 'terraform state rm docker_container.grafana 2>/dev/null || true'
+                    sh 'terraform state rm docker_image.grafana 2>/dev/null || true'
+                    sh 'docker stop prometheus grafana 2>/dev/null || true'
+                    sh 'docker rm prometheus grafana 2>/dev/null || true'
                     sh "terraform apply -auto-approve -var=image_tag=${IMAGE_TAG}"
                 }
             }
